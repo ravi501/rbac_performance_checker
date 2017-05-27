@@ -1,6 +1,7 @@
 from util.permissions_reader import read_permissions_csv_file
 
-class permissions:
+
+class Permissions:
 
     def __init__(self):
         self.permissions = []
