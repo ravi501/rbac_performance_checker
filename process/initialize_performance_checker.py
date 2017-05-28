@@ -1,6 +1,7 @@
 from data_elements.permissions import read_permissions_csv_file
 
 from data_elements import roles
+from data_elements import users_permission_requirements
 
 from process import constants
 
@@ -16,6 +17,7 @@ class Checker:
         self.total_roles = constants.TOTAL_SYSTEM_ROLES
         self.total_users = constants.TOTAL_SYSTEM_USERS
         self.role_size = []
+        self.users_requirements = []
 
     def initialize_system_permissions(self):
         self.permissions = read_permissions_csv_file(self.total_permissions)
@@ -71,17 +73,42 @@ class Checker:
                 print(str(role[i].permissions_in_role[j]), end = " ")
             print()
 
-"""
     def generate_users_requirements(self):
-
-        for i in range(0, self.total_users - 1):
+        self.users_requirements = [0] * self.total_users
+        for i in range(0, self.total_users):
             j = 0
             while j < constants.PERMISSION_PER_USER:
+                user_req = random.randint(0, self.total_permissions - 1)
+                translated_reqs = self.permissions[user_req]
+                k = 0
+                while k < j:
+                    if translated_reqs == self.users_requirements[i].user_permissions[k]:
+                        user_req = random.randint(0, self.total_permissions - 1)
+                        translated_reqs = self.permissions[user_req]
+                        k = 0;
+                    else:
+                        k += 1
+                if self.users_requirements[i] == 0:
+                    user_req = users_permission_requirements.UserRequirements()
+                    user_req.user_permissions.append(translated_reqs)
+                    self.users_requirements[i] = user_req
+                else:
+                    self.users_requirements[i].user_permissions.append(translated_reqs)
+                j += 1
 
-"""
+    def print_user_requirements(self):
+        for i in range(0, self.total_users):
+            print("User " + str(i) + " requirements: ", end="")
+            for j in range(0, len(self.users_requirements[i].user_permissions)):
+                print(self.users_requirements[i].user_permissions[j] + " ", end="")
+            print()
 
 checker = Checker()
 checker.initialize_system_permissions()
 checker.print_system_permissions()
 role = checker.allot_permissions_to_roles()
 checker.print_permission_to_roles_assignment(role)
+
+print("===============================================")
+checker.generate_users_requirements()
+checker.print_user_requirements()
